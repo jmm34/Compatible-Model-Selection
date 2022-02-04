@@ -1,5 +1,4 @@
-# compatible-model-selection`
-
+# compatible-model-selection
 
 We consider a random variable $X$ defined on a probability space $(\Omega, {\cal B}, \mu)$.
 The probability distribution of $X$ is assumed to be absolutely continuous with respect to the measure $\mu$.
