@@ -1,10 +1,13 @@
 ---
 title: "Compatible model selection"
 author: "Jean-Michel Marin"
-date: "4/26/2021"
+date: "4/02/2022"
 output: pdf_document
 fontsize: 11pt
 numbersections: true
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -17,8 +20,8 @@ We consider an $n$-sample from $F=\mathcal{N}(0,1)$.
 
 ## Known variance - True model belongs to the parametric family
 
-We consider the parametric family
-$Q_\theta=\mathcal{N}(\theta,1)$ where $\theta\in\mathbb{R}$.
+We consider the parametric family $Q_\theta=\mathcal{N}(\theta,1)$ where
+$\theta\in\mathbb{R}$.
 
 In such a case, we have
 $\displaystyle \beta=\max_{\theta\in\mathbb{R}}\int\log(q(y|\theta))f(y)\text{d}y=-\log(2\pi)/2-1/2$.
@@ -28,7 +31,7 @@ For the $n$-sample we have $\beta_n=-n/2\log(2\pi)-n/2$.
 ```{r gaussian1, cache=TRUE}
 beta <- -1/2*log(2*pi)-1/2
 N <- 1000 ; n <- 500 ; B <- 500 ; alpha <- 0.1
-statboot <- rep(0,B) ; moy <- ampli <- cover <- 0
+statboot <- rep(0,B) ; cover <- 0
 for (i in 1:N)
 {
   x <- rnorm(n)
@@ -41,27 +44,26 @@ for (i in 1:N)
   }
   interva <- -1/2*log(2*pi)-sn2/2-
     quantile(statboot,c(1-alpha/2,alpha/2),names=FALSE)
-  moy <- moy+sum(interva)/2
-  ampli <- ampli+diff(interva)
   cover <- cover + (beta >= interva[1] & beta <= interva[2])
 }
-c(beta,moy/N,ampli/N,cover/N)
+cover/N
 ```
 
 ## Unknown variance - True model belongs to the parametric family
 
 We consider the parametric family
-$Q_{(\mu,\sigma^2)}=\mathcal{N}(\mu,\sigma^2)$ where $(\mu,\sigma^2)\in\mathbb{R}\times\mathbb{R}_+^*$.
+$Q_{(\mu,\sigma^2)}=\mathcal{N}(\mu,\sigma^2)$ where
+$(\mu,\sigma^2)\in\mathbb{R}\times\mathbb{R}_+^*$.
 
 In such a case, we have
-$\displaystyle \beta=\max_{(\mu,\sigma^2)\in\in\mathbb{R}\times\mathbb{R}_+^*}\int\log(q(y|(\mu,\sigma^2)))f(y)\text{d}y=-\log(2\pi)/2-1/2$. 
+$\displaystyle \beta=\max_{(\mu,\sigma^2)\in\in\mathbb{R}\times\mathbb{R}_+^*}\int\log(q(y|(\mu,\sigma^2)))f(y)\text{d}y=-\log(2\pi)/2-1/2$.
 
 For the $n$-sample, we have $\beta_n=-n/2\log(2\pi)-n/2$.
 
 ```{r gaussian2, cache=TRUE}
 beta <- -1/2*log(2*pi)-1/2
 N <- 1000 ; n <- 500 ; B <- 500 ; alpha <- 0.1
-statboot <- rep(0,B) ; moy <- ampli <- cover <- 0
+statboot <- rep(0,B) ; cover <- 0
 for (i in 1:N)
 {
   x <- rnorm(n)
@@ -74,21 +76,18 @@ for (i in 1:N)
   }
   interva <- -1/2*(log(2*pi)+1)-log(sn2)/2-
     quantile(statboot,c(1-alpha/2,alpha/2),names=FALSE)
-  moy <- moy+sum(interva)/2
-  ampli <- ampli+diff(interva)
   cover <- cover + (beta >= interva[1] & beta <= interva[2])
 }
-c(beta,moy/N,ampli/N,cover/N)
+cover/N
 ```
 
 # Regression example
 
-We consider an $n$-sample from the Gaussian regression model
-$$
+We consider an $n$-sample from the Gaussian regression model $$
 F=[y|x_1,x_2]=\mathcal{N}(1+x_1+x_2,1)\,.
 $$
 
-```{r regression-design-matrix, cache=TRUE}
+```{r regression-design-matrix, eval=FALSE}
 n <- 500
 X <- cbind(rep(1,n),matrix(rnorm(n*2),n,2))
 Xm <- solve(t(X)%*%X)
@@ -98,10 +97,12 @@ betan <- -n/2*log(2*pi)-n/2
 
 ## Known variance - True model belongs to the parametric family
 
-We consider the parametric family $Q_{(\theta_0,\theta_1,\theta_2)}=\mathcal{N}(\theta_0+\theta_1x_1+\theta_2x_2,1)$.
-In such a case, for the $n$-sample, we have $\beta_n=-n/2\log(2\pi)-n/2$.
+We consider the parametric family
+$Q_{(\theta_0,\theta_1,\theta_2)}=\mathcal{N}(\theta_0+\theta_1x_1+\theta_2x_2,1)$.
+In such a case, for the $n$-sample, we have
+$\beta_n=-n/2\log(2\pi)-n/2$.
 
-```{r regression1, cache=TRUE}
+```{r regression1, eval=FALSE}
 N <- 1000 ; B <- 500 ; alpha <- 0.1
 statboot <- rep(0,B) ; moy <- ampli <- cover <- 0
 # tp <- txtProgressBar(min = 1, max = N, style = 3, char = "*")
@@ -130,14 +131,13 @@ c(betan,moy/N,ampli/N,cover/N)
 
 ## Unknown variance - True model belongs to the parametric family
 
-We consider the parametric family $Q_{(\theta_0,\theta_1,\theta_2,\theta_3)}=\mathcal{N}(\theta_0+\theta_1x_1+\theta_2x_2,\theta_3)$ where $\theta_3>0$.
-In such a case, for the $n$-sample, we have 
-$$
+We consider the parametric family
+$Q_{(\theta_0,\theta_1,\theta_2,\theta_3)}=\mathcal{N}(\theta_0+\theta_1x_1+\theta_2x_2,\theta_3)$
+where $\theta_3>0$. In such a case, for the $n$-sample, we have $$
 \beta_n=-n/2\log(2\pi)-n/2
 $$
 
-
-```{r regression2, cache=TRUE}
+```{r regression2, eval=FALSE}
 N <- 1000 ; B <- 500 ; alpha <- 0.1
 statboot <- rep(0,B) ; moy <- ampli <- cover <- 0
 # tp <- txtProgressBar(min = 1, max = N, style = 3, char = "*")
@@ -166,14 +166,11 @@ c(betan,moy/N,ampli/N,cover/N)
 
 ## Unknown variance - True model bigger than the quasi true model
 
-We consider the parametric family 
-$$
+We consider the parametric family $$
 Q_{(\theta_0,\theta_1)}=\mathcal{N}(\theta_0+\theta_1x_1,\theta_3)
 $$
 
-
-
-```{r regression3, cache=TRUE}
+```{r regression3, eval=FALSE}
 N <- 1000 ; B <- 500 ; alpha <- 0.1
 statboot <- rep(0,B) ; moy <- ampli <- cover <- 0
 # tp <- txtProgressBar(min = 1, max = N, style = 3, char = "*")
